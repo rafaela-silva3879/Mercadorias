@@ -1,0 +1,207 @@
+﻿@model Mercadorias.Presentation.Models.SaidaSearchModel
+
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+    ViewBag.Title = "Create";
+}
+
+
+
+
+<form id="friendform">
+<div class="alert alert-success" id="divSuccess">
+   </div>
+
+<div class="alert alert-danger" id="divErro">
+  </div>
+    <h5>Consulta de saídas</h5>
+    <p>Informe o período de datas para consultar suas saídas.</p>
+    <div class="row">
+        <div class="col-md-3">
+            <input type="date" id="txtDataMin" required name="DataMin" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <input type="date" id="txtDataMax" required name="DataMax" class="form-control" />
+        </div>
+        <div class="col-md-6">
+
+            <input type="submit" id="btnSubmit" class="btn btn-success" value="Pesquisar" />
+
+        </div>
+    </div>
+   
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <table id="exampleDatatable" class="table table-sm table-hover mt-3">
+                <thead>
+                    <tr>
+                        <th>Quantidade de Saída</th>
+                        <th>Local</th>
+                        <th>Data e Hora</th>
+                        <th>Nome da Mercadoria</th>    
+                        <th>Quantidade Restante</th> 
+                        <th>Número do Registro</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</form>
+
+
+
+<!---Datatables-->
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.13.2/af-2.5.2/datatables.min.css" />
+<script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
+<!--End datatables-->
+@*<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<style>
+
+    .my-error-class {
+        color: #FF0000; /* red */
+    }
+
+    .my-valid-class {
+        color: #00CC00; /* green */
+    }
+    th, td {/*a altura da linha estava grande demais*/
+        vertical-align: middle !important; /* alinha verticalmente */
+        height: 36px; /* altura customizada da celula */
+        padding: 0 16px !important; /* 0 de padding na vertical e 16px na horizontal */
+    }
+</style>
+
+
+<script>
+    jQuery.extend(jQuery.validator.messages, {
+        required: "Este campo é requerido.",
+        remote: "Por favor, conserte este campo.",
+        email: "Por favor, rescreva um formato de email válido.",
+        url: "Por favor, escreva uma URL válida.",
+        date: "Por favor, entre uma fata válida.",
+        dateISO: "Por favor, escreva uma data (ISO) válida.",
+        number: "Por favor, somente números.",
+        digits: "Por favor, somente dígitos.",
+        creditcard: "Por favor, escreva um formato de cartão de crédito válido.",
+        equalTo: "Por favor, escreva o mesmo valor.",
+        accept: "Por favor, escreva um valor com uma extensão válida.",
+        maxlength: jQuery.validator.format("Por favor, não escreva mais do que {0} caracteres."),
+        minlength: jQuery.validator.format("Por favor, escreva pelo menos {0} caracteres."),
+        rangelength: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1} caracteres."),
+        range: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1}."),
+        max: jQuery.validator.format("Por favor, escreva um valor menor ou igual a {0}."),
+        min: jQuery.validator.format("Por favor, escreva um valor maior ou igual a {0}."),
+
+    });
+
+
+
+
+
+        $(document).ready(function () {
+
+
+
+        $("form").validate({
+            errorClass: "my-error-class",
+            validClass: "my-valid-class"
+        });
+
+
+          $("#divErro").hide();
+        $("#divSuccess").hide();
+
+
+        $("#btnSubmit").click(function (e) {
+            $("#divErro").hide();
+            if ($("form").valid())
+            {
+            $('#friendform').on('submit', function (e) {
+                e.preventDefault();
+
+                    var SaidaSearchModel = { DataMin: $("#txtDataMin").val(), DataMax: $("#txtDataMax").val() }
+
+
+                $.ajax({
+                    url: "/Saida/SearchSaidaMercadoria",
+                    type: "POST",
+                    contentType: "application/json; chatset=utf-8",
+                    cache: false,
+                    data: JSON.stringify(SaidaSearchModel),
+                    success: function (response) {
+                        $("#divErro").hide();
+                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                            $("#errorMsg").html(response.errorStr);
+
+                            $("#divErro").show();
+                        }
+                        else {
+                            var table = $("#table tbody");
+                            table.html("");
+                            $(response).each(function () {
+
+                                table.append('<tr><td>' + this.quantidade + "</td><td>" + this.local + "</td>   <td>" + this.dataHora + "</td>    <td>" + this.nomeMercadoria + "</td>    
+                                   
+                                   '<td>' + this.quantidadeRestante + "</td><td>" + this.numeroResistro + "</td>"   
+                                    '</tr >' )
+
+                            });
+
+                            $('#qtt').html(response.length);
+
+                            var table2 = $('#exampleDatatable').DataTable();
+                            table2.destroy();
+
+                            $("#exampleDatatable").DataTable({
+                                data: response,
+                                retrieve: true,//datatables não dão refresh, então é preciso colocar essa linha pra dizer que é pra usar os dados antigos no click de um botão.   
+                                destroy: true,
+                                columns:
+                                    [
+                                        { 'data': 'quantidade' },
+                                        { 'data': 'local' },
+                                        { 'data': 'datahora' },
+                                        { 'data': 'nomeMercadoria' },
+                                        { 'data': 'quantidadeRestante' },
+                                        { 'data': 'numeroRegistro' },
+                                        {
+                                            "mData": null,
+                                            "bSortable": false,
+                                            "mRender": function (o) {
+                                                
+                                            }
+                                        },
+                                    ]
+                            });
+
+                        }
+
+
+
+                    },
+                    error: function (xhr, status, error) {
+
+                        alert("ERRO!" + xhr.responseText);
+                    }
+                });
+            });
+
+        }
+
+
+
+
+        });
+
+
+    })
+   
+</script>
+

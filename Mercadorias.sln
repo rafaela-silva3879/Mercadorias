@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.33423.256
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 - Services", "1 - Services", "{B3278E87-5D22-4BF7-8AE6-EDB160E5564A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 - Application", "2 - Application", "{4840F440-4BBF-4B97-9202-461F0DD1624A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "3 - Domain", "3 - Domain", "{4B4276A5-F65A-44B0-8391-CEFA2A7E5190}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "4 - Infrastructure", "4 - Infrastructure", "{81F0D0C7-0009-4E77-AE09-1BAEBD106102}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercadorias.Application", "Mercadorias.Application\Mercadorias.Application.csproj", "{C2BF9E0A-D903-4F93-8515-C43B64F676B0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercadorias.Domain", "Mercadorias.Domain\Mercadorias.Domain.csproj", "{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercadorias.Infra.Repository", "Mercadorias.Infra.Repository\Mercadorias.Infra.Repository.csproj", "{3B9A8F34-CE50-453C-A5F4-341CBF5A7293}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mercadorias.Presentation", "Mercadorias.Presentation\Mercadorias.Presentation.csproj", "{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C2BF9E0A-D903-4F93-8515-C43B64F676B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2BF9E0A-D903-4F93-8515-C43B64F676B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2BF9E0A-D903-4F93-8515-C43B64F676B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2BF9E0A-D903-4F93-8515-C43B64F676B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B9A8F34-CE50-453C-A5F4-341CBF5A7293}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B9A8F34-CE50-453C-A5F4-341CBF5A7293}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B9A8F34-CE50-453C-A5F4-341CBF5A7293}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B9A8F34-CE50-453C-A5F4-341CBF5A7293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C2BF9E0A-D903-4F93-8515-C43B64F676B0} = {4840F440-4BBF-4B97-9202-461F0DD1624A}
+		{AB7CF04C-E0C5-4D67-BAB9-FD745A56D6BF} = {4B4276A5-F65A-44B0-8391-CEFA2A7E5190}
+		{3B9A8F34-CE50-453C-A5F4-341CBF5A7293} = {81F0D0C7-0009-4E77-AE09-1BAEBD106102}
+		{AF88E1B3-0628-4DE1-8FB1-D2D9F7C05D96} = {B3278E87-5D22-4BF7-8AE6-EDB160E5564A}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3BEA8649-511D-40C2-B1A6-815091338105}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,225 @@
+﻿@model Mercadorias.Presentation.Models.SaidaCreateModel
+
+@{
+    Layout = "~/Views/Shared/Layout.cshtml";
+    ViewBag.Title = "Create";
+}
+<div class="alert alert-success" id="divSuccess">
+    <strong>Sucesso!</strong> <label id="successMsg"></label>
+   @* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+</div>
+
+<div class="alert alert-danger" id="divErro">
+    <strong>Erro!</strong>  <label id="errorMsg"></label>
+@*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+</div>
+
+<h5>Nova Saída</h5>
+
+<form id="Saidaform">
+    <div class="row">
+        <div class="col-md-12">
+            <label>Quantidade da saída:</label>
+            <input id="txtQuantidadeSaida" number name="QuantidadeSaida" type="text" required minlength="1" maxlength="1000" class="form-control" />
+
+        </div>
+
+        <div class="col-md-3">
+            <label>Data e hora da saída:</label>
+            <input type="datetime-local" id="meeting-time"
+                   name="DataHoraEntrada" value="2023-01-01T19:30"
+                   min="2023-01-01T00:00" max="" class="form-control">
+        </div>
+        <div class="col-md-4">
+
+            <label>Descrição</label>
+            <textarea required id="txtDescricao" lettersanddotsonly name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+        <label>Local de saída:</label>
+        <input type="text" lettersonly class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
+    </div>
+     <div class="col-md-4">
+            <label>Mercadorias</label>
+            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
+        </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <br />
+            <input id="btnSubmit" type="button" value="Submit" class="btn btn-primary" />
+        </div>
+    </div>
+</form>
+
+            
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<!--Mask-->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery.maskedinput/1.4.1/jquery.maskedinput.min.js"></script>
+<!--Mask-->
+<style>
+    .my-error-class {
+        color: #FF0000; /* red */
+    }
+
+    .my-valid-class {
+        color: #00CC00; /* green */
+    }
+</style>
+
+<script>
+    jQuery.extend(jQuery.validator.messages, {
+        required: "Este campo é requerido.",
+        remote: "Por favor, conserte este campo.",
+        email: "Por favor, rescreva um formato de email válido.",
+        url: "Por favor, escreva uma URL válida.",
+        date: "Por favor, entre uma fata válida.",
+        dateISO: "Por favor, escreva uma data (ISO) válida.",
+        number: "Por favor, somente números.",
+        digits: "Por favor, somente dígitos.",
+        creditcard: "Por favor, escreva um formato de cartão de crédito válido.",
+        equalTo: "Por favor, escreva o mesmo valor.",
+        accept: "Por favor, escreva um valor com uma extensão válida.",
+        maxlength: jQuery.validator.format("Por favor, não escreva mais do que {0} caracteres."),
+        minlength: jQuery.validator.format("Por favor, escreva pelo menos {0} caracteres."),
+        rangelength: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1} caracteres."),
+        range: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1}."),
+        max: jQuery.validator.format("Por favor, escreva um valor menor ou igual a {0}."),
+        min: jQuery.validator.format("Por favor, escreva um valor maior ou igual a {0}."),
+
+
+    });
+
+
+    $(document).ready(function () {
+
+
+
+
+
+        //$.validator.addMethod("lettersonly", function (value, element) {
+        //    return this.optional(element) || /^[a-zA-Z\-\s]+$/i.test(value);
+        //}, "Username must contain only letters, numbers, or dashes.");
+
+        $("form").validate({
+            errorClass: "my-error-class",
+            validClass: "my-valid-class",
+            rules:
+            {
+                FriendName:
+                {
+                    "lettersanddotsonly": true
+                },
+                State:
+                {
+                    "lettersonly": true
+                }
+            },
+            messages:
+            {
+                FriendName:
+                {
+                    "lettersonly": "Somente letras, pontos e espaços."
+                },
+                State:
+                {
+                    "lettersonly": "Este campo aceita somente letras."
+                }
+            }
+
+        });
+
+
+
+        $.validator.addMethod('lettersanddotsonly', function (value, element) {
+            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
+        }, "Por favor, escreva um nome válido.");
+
+        $.validator.addMethod('lettersonly', function (value, element) {
+            return this.optional(element) || /^[A-Z]+$/.test(value);
+        }, "Este campo aceita somente letras.");
+
+
+
+        $("#divErro").hide();
+        $("#divSuccess").hide();
+        $("#divWarning").hide();
+
+
+        $.ajax({
+            type: "GET",
+            url: "/Mercadoria/GetMercadoria",
+            success: function (data) {
+
+                console.log(data);
+                console.log('Ok');
+
+                var s = '<option value="">Por favor, selecione uma mercadoria.</option>';
+                for (var i = 0; i < data.length; i++) {
+                    s += '<option value="' + data[i].id + '">' + data[i].nome + '</option>';
+                }
+                $("#txtmercadoriaDropdown").html(s);
+            },
+            error: function (e) {
+                console.log('erro');
+                alert('Erro');
+            }
+        });
+
+
+
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+            if ($("form").valid()) {
+                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), IdMercadoria: $("#txtmercadoriaDropdown").val()}
+
+
+                $.ajax({
+                    url: "/Saida/AddSaida",
+                    type: "POST",
+                    contentType: "application/json; chatset=utf-8",
+                    cache: false,
+                    data: JSON.stringify(CreateModel),
+                    success: function (response) {
+                        $("#divErro").hide();
+                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                            $("#errorMsg").html(response.errorStr);
+                            alert("response:" + response.errorStr);
+                            $("#divErro").show();
+                        }
+                        else {
+                            $("#divSuccess").show();
+                            $("#successMsg").html(response);
+                            console.log(response)
+                            $("#txtMercadoriaName").val('');
+                            $("#txtRegistro").val('');
+                            $("#txtFabricante").val('');
+                            $("#txtTipo").val('');
+                            $("#txtDescricao").val('');
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        alert(xhr.responseText);
+                    }
+                });
+
+
+            }
+
+
+
+        });
+
+
+      
+
+
+    });
+</script>
