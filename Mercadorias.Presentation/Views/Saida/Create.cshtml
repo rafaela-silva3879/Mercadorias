@@ -6,12 +6,12 @@
 }
 <div class="alert alert-success" id="divSuccess">
     <strong>Sucesso!</strong> <label id="successMsg"></label>
-   @* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+    @* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
 </div>
 
 <div class="alert alert-danger" id="divErro">
     <strong>Erro!</strong>  <label id="errorMsg"></label>
-@*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+    @*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
 </div>
 
 <h5>Nova Saída</h5>
@@ -20,11 +20,23 @@
     <div class="row">
         <div class="col-md-12">
             <label>Quantidade da saída:</label>
-            <input id="txtQuantidadeSaida" number name="QuantidadeSaida" type="text" required minlength="1" maxlength="1000" class="form-control" />
+            <input id="txtQuantidadeSaida" name="QuantidadeSaida" type="text" required minlength="1" maxlength="1000" class="form-control" />
 
         </div>
+    </div>
 
-        <div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label>Local de saída:</label>
+            <input type="text" class="form-control" required id="txtLocalSaida" name="LocalSaida" maxlength="50" />
+        </div>
+        <div class="col-md-4">
+            <label>Mercadorias</label>
+            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4">
             <label>Data e hora da saída:</label>
             <input type="datetime-local" id="meeting-time"
                    name="DataHoraEntrada" value="2023-01-01T19:30"
@@ -33,21 +45,11 @@
         <div class="col-md-4">
 
             <label>Descrição</label>
-            <textarea required id="txtDescricao" lettersanddotsonly name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
+            <textarea required id="txtDescricao" name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
 
         </div>
 
     </div>
-
-    <div class="col-md-4">
-        <label>Local de saída:</label>
-        <input type="text" lettersonly class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
-    </div>
-     <div class="col-md-4">
-            <label>Mercadorias</label>
-            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
-        </div>
-
     <div class="row">
         <div class="col-md-12">
             <br />
@@ -56,7 +58,7 @@
     </div>
 </form>
 
-            
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <!--Mask-->
@@ -100,42 +102,14 @@
     $(document).ready(function () {
 
 
+        $("#divErro").hide();
+        $("#divSuccess").hide();
+        $("#divWarning").hide();
 
 
-
-        //$.validator.addMethod("lettersonly", function (value, element) {
-        //    return this.optional(element) || /^[a-zA-Z\-\s]+$/i.test(value);
-        //}, "Username must contain only letters, numbers, or dashes.");
-
-        $("form").validate({
-            errorClass: "my-error-class",
-            validClass: "my-valid-class",
-            rules:
-            {
-                FriendName:
-                {
-                    "lettersanddotsonly": true
-                },
-                State:
-                {
-                    "lettersonly": true
-                }
-            },
-            messages:
-            {
-                FriendName:
-                {
-                    "lettersonly": "Somente letras, pontos e espaços."
-                },
-                State:
-                {
-                    "lettersonly": "Este campo aceita somente letras."
-                }
-            }
-
-        });
-
-
+        $.validator.addMethod('numbersonly', function (value, element) {
+            return this.optional(element) || /^[0-9]+$/.test(value);
+        }, "Este campo aceita somente números.");
 
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
             return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
@@ -145,20 +119,45 @@
             return this.optional(element) || /^[A-Z]+$/.test(value);
         }, "Este campo aceita somente letras.");
 
+        $("form").validate({
+            errorClass: "my-error-class",
+            validClass: "my-valid-class",
+            rules:
+            {
+                QuantidadeSaida:
+                {
+                    "numbersonly": true
+                },
+                LocalSaida:
+                {
+                    "lettersanddotsonly": true
+                },
+                Descricao:
+                {
+                    "lettersanddotsonly": true
+                },
+            },
+            messages:
+            {
+                LocalSaida:
+                {
+                    "lettersanddotsonly": "Somente letras, pontos e espaços."
+                },
+                Descricao:
+                {
+                    "lettersanddotsonly": "Este campo aceita somente letras, pontos e espaços."
+                }
+            }
+
+        });
 
 
-        $("#divErro").hide();
-        $("#divSuccess").hide();
-        $("#divWarning").hide();
 
 
         $.ajax({
             type: "GET",
             url: "/Mercadoria/GetMercadoria",
             success: function (data) {
-
-                console.log(data);
-                console.log('Ok');
 
                 var s = '<option value="">Por favor, selecione uma mercadoria.</option>';
                 for (var i = 0; i < data.length; i++) {
@@ -167,8 +166,8 @@
                 $("#txtmercadoriaDropdown").html(s);
             },
             error: function (e) {
-                console.log('erro');
-                alert('Erro');
+                console.log('Erro. \n' + e);
+                alert('Erro. \n'+ e);
             }
         });
 
@@ -177,7 +176,7 @@
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
             if ($("form").valid()) {
-                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), IdMercadoria: $("#txtmercadoriaDropdown").val()}
+                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), IdMercadoria: $("#txtmercadoriaDropdown").val() }
 
 
                 $.ajax({
@@ -218,7 +217,7 @@
         });
 
 
-      
+
 
 
     });

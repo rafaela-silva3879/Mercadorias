@@ -99,38 +99,54 @@
 
 
     $(document).ready(function () {
+        $.validator.addMethod('numberssonly', function (value, element) {
+            return this.optional(element) || /^[0-9]+$/.test(value);
+        }, "Este campo aceita somente números.");
+        $.validator.addMethod('lettersanddotsonly', function (value, element) {
+            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
+        }, "Este campo aceita somente letras e pontos.");
+
+        $.validator.addMethod('lettersonly', function (value, element) {
+            return this.optional(element) || /^[A-Z]+$/.test(value);
+        }, "Este campo aceita somente letras.");
 
 
-
-
-
-        //$.validator.addMethod("lettersonly", function (value, element) {
-        //    return this.optional(element) || /^[a-zA-Z\-\s]+$/i.test(value);
-        //}, "Username must contain only letters, numbers, or dashes.");
 
         $("form").validate({
             errorClass: "my-error-class",
             validClass: "my-valid-class",
             rules:
             {
-                FriendName:
+                NumeroRegistro:
+                {
+                    "numberssonly": true
+                },
+                Nome:
                 {
                     "lettersanddotsonly": true
                 },
-                State:
+                Fabricante:
                 {
-                    "lettersonly": true
+                    "lettersanddotsonly": true
+                },
+                Tipo:
+                {
+                    "lettersanddotsonly": true
+                },
+                Descricao:
+                {
+                    "lettersanddotsonly": true
                 }
             },
             messages:
             {
-                FriendName:
+                Nome:
                 {
-                    "lettersonly": "Somente letras, pontos e espaços."
+                    "lettersanddotsonly": "Por favor, escreva um nome válido."
                 },
-                State:
+                Descricao:
                 {
-                    "lettersonly": "Este campo aceita somente letras."
+                    "lettersanddotsonly": "Por favor, escreva uma descrição válida."
                 }
             }
 
@@ -138,13 +154,7 @@
 
 
 
-        $.validator.addMethod('lettersanddotsonly', function (value, element) {
-            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
-        }, "Por favor, escreva um nome válido.");
-
-        $.validator.addMethod('lettersonly', function (value, element) {
-            return this.optional(element) || /^[A-Z]+$/.test(value);
-        }, "Este campo aceita somente letras.");
+ 
 
 
 

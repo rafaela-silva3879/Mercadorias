@@ -4,14 +4,15 @@
     Layout = "~/Views/Shared/Layout.cshtml";
     ViewBag.Title = "Create";
 }
+
 <div class="alert alert-success" id="divSuccess">
     <strong>Sucesso!</strong> <label id="successMsg"></label>
-   @* <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+    @*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
 </div>
 
 <div class="alert alert-danger" id="divErro">
     <strong>Erro!</strong>  <label id="errorMsg"></label>
-@*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
+    @*    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>*@
 </div>
 
 <h5>Nova Entrada</h5>
@@ -20,15 +21,28 @@
     <div class="row">
         <div class="col-md-12">
             <label>Quantidade da entrada:</label>
-            <input id="txtQuantidadeEntrada"  number name="QuantidadeEntrada" type="text" required minlength="1" maxlength="1000" class="form-control" />
+            <input id="txtQuantidadeEntrada" name="QuantidadeEntrada" type="text" number required minlength="1" maxlength="1000" class="form-control" />
 
         </div>
+    </div>
 
-        <div class="col-md-3">
+    <div class="row">
+        <div class="col-md-4">
+            <label>Local de entrada:</label>
+            <input type="text" lettersonly class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
+        </div>
+        <div class="col-md-4">
+            <label>Mercadorias</label>
+            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
             <label>Data e hora da entrada:</label>
             <input type="datetime-local" id="meeting-time"
                    name="DataHoraEntrada" value="2023-01-01T19:30"
-                   min="2023-01-01T00:00" max="" class="form-control">
+                   min="2023-01-01T00:00" max="" class="form-control" />
         </div>
         <div class="col-md-4">
 
@@ -36,18 +50,7 @@
             <textarea required id="txtDescricao" lettersanddotsonly name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
 
         </div>
-
     </div>
-
-    <div class="col-md-4">
-        <label>Local de entrada:</label>
-        <input type="text" lettersonly class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
-    </div>
-
-     <div class="col-md-4">
-            <label>Mercadorias</label>
-            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
-        </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -57,7 +60,7 @@
     </div>
 </form>
 
-            
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 <!--Mask-->
@@ -75,6 +78,10 @@
 </style>
 
 <script>
+
+
+
+
     jQuery.extend(jQuery.validator.messages, {
         required: "Este campo é requerido.",
         remote: "Por favor, conserte este campo.",
@@ -92,86 +99,145 @@
         rangelength: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1} caracteres."),
         range: jQuery.validator.format("Por favor, escreva um valor entre {0} e {1}."),
         max: jQuery.validator.format("Por favor, escreva um valor menor ou igual a {0}."),
-        min: jQuery.validator.format("Por favor, escreva um valor maior ou igual a {0}."),
+        min: jQuery.validator.format("Por favor, escreva um valor maior ou igual a {0}.")
 
 
     });
 
 
+
     $(document).ready(function () {
 
+        $("#divErro").hide();
+        $("#divSuccess").hide();
 
-
-
-
-        //$.validator.addMethod("lettersonly", function (value, element) {
-        //    return this.optional(element) || /^[a-zA-Z\-\s]+$/i.test(value);
-        //}, "Username must contain only letters, numbers, or dashes.");
-
-        $("form").validate({
-            errorClass: "my-error-class",
-            validClass: "my-valid-class",
-            rules:
-            {
-                FriendName:
-                {
-                    "lettersanddotsonly": true
-                },
-                State:
-                {
-                    "lettersonly": true
-                }
-            },
-            messages:
-            {
-                FriendName:
-                {
-                    "lettersonly": "Somente letras, pontos e espaços."
-                },
-                State:
-                {
-                    "lettersonly": "Este campo aceita somente letras."
-                }
-            }
-
-        });
-
-
-
+        $.validator.addMethod('numbersonly', function (value, element) {
+            return this.optional(element) || /^[0-9]+$/.test(value);
+        }, "Este campo aceita somente números.");
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
             return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
-        }, "Por favor, escreva um nome válido.");
-
+        }, "Este campo aceita somente letras e pontos.");
         $.validator.addMethod('lettersonly', function (value, element) {
             return this.optional(element) || /^[A-Z]+$/.test(value);
         }, "Este campo aceita somente letras.");
 
 
 
-        $("#divErro").hide();
-        $("#divSuccess").hide();
-        $("#divWarning").hide();
+        $("form").validate({
+            errorClass: "my-error-class",
+            validClass: "my-valid-class",
+            rules:
+            {
+                QuantidadeEntrada:
+                {
+                    "numbersonly": true
+                },
+                Descricao:
+                {
+                    "lettersanddotsonly": true
+                },
+                LocalEntrada:
+                {
+                    "lettersanddotsonly": true
+                }
+            },
+            messages:
+            {
+                LocalEntrada:
+                {
+                    "lettersanddotsonly": "Por favor, escreva um local válido."
+                },
+                Descricao:
+                {
+                    "lettersanddotsonly": "Por favor, escreva uma descrição válida."
+                }
+            }
+
+        });
 
 
-          $.ajax({
+
+      
+
+        $.ajax({
             type: "GET",
             url: "/Mercadoria/GetMercadoria",
+            contentType: "application/json; chatset=utf-8",
+            cache: false,
+            data: "{}",
             success: function (data) {
-
-                console.log(data);
-                console.log('Ok');
-
                 var s = '<option value="">Por favor, selecione uma mercadoria.</option>';
                 for (var i = 0; i < data.length; i++) {
                     s += '<option value="' + data[i].id + '">' + data[i].nome + '</option>';
                 }
                 $("#txtmercadoriaDropdown").html(s);
             },
-            error: function (e) {
-                console.log('erro');
-                alert('Erro');
+            error: function (xhr, status, error) {
+
+                alert(xhr.responseText);
             }
         });
+
+
+
+
+        $("#btnSubmit").click(function (e) {
+            e.preventDefault();
+            if ($("form").valid()) {
+                //var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), state: $("#statesDropdown").val() }
+                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), State: $("#statesDropdown").val() }
+                var y = JSON.stringify(CreateModel);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Friend/AddFriend",
+                    data: { 'json': y },
+                    //contentType: "application/json; charset=utf-8",
+                    dataType: "json",
+                    success: function (response) {
+                        $("#divErro").hide();
+                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                            $("#errorMsg").html(response.errorStr);
+                            alert("response:" + response.errorStr);
+                            $("#divErro").show();
+                        }
+                        else {
+                            $("#divSuccess").show();
+                            $("#successMsg").html(response);
+                            console.log(response)
+                            $("#txtFriendName").val('');
+                            $("#txtPhone").val('');
+                            $("#txtState").val('');
+
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        //alert(xhr.responseText);
+                    }
+                });
+            }
+        });
+
+
+
+
+        $("#txtPhone").mask("(99)99999-9999");
+
+        $("#txtPhone").on("blur", function () {
+            var last = $(this).val().substr($(this).val().indexOf("-") + 1);
+
+            if (last.length == 3) {
+                var move = $(this).val().substr($(this).val().indexOf("-") - 1, 1);
+                var lastfour = move + last;
+                var first = $(this).val().substr(0, 9);
+
+                $(this).val(first + '-' + lastfour);
+            }
+        });
+
+
+
 
 
         $("#btnSubmit").click(function (e) {
@@ -188,7 +254,8 @@
                     data: JSON.stringify(CreateModel),
                     success: function (response) {
                         $("#divErro").hide();
-                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                        if (response.errorStr != undefined &&
+                            response.errorStr != null && response.errorStr != '') {
                             $("#errorMsg").html(response.errorStr);
                             alert("response:" + response.errorStr);
                             $("#divErro").show();
@@ -209,9 +276,13 @@
                         alert(xhr.responseText);
                     }
                 });
-
-
             }
         });
+
+
+
+
+
+
     });
 </script>
