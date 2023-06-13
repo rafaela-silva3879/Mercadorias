@@ -103,7 +103,7 @@
             return this.optional(element) || /^[0-9]+$/.test(value);
         }, "Este campo aceita somente números.");
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
-            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
+            return this.optional(element) || /^[a-zA-Z.\s'éãíúóÓÉÁÚç]+$/.test(value);
         }, "Este campo aceita somente letras e pontos.");
 
         $.validator.addMethod('lettersonly', function (value, element) {

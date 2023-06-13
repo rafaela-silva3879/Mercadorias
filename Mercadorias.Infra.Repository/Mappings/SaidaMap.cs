@@ -26,10 +26,12 @@ namespace Mercadorias.Infra.Repository.Mappings
                 .HasMaxLength(100)
                 .IsRequired();
 
+
             builder.HasOne(s => s.Mercadoria)
                 .WithMany(m => m.Saidas)
-                .HasForeignKey(s => s.IdSaida)
+                .HasForeignKey(s => s.IdMercadoria)
                 .OnDelete(DeleteBehavior.NoAction);
+
         }
     }
 }

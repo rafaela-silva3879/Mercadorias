@@ -4,14 +4,16 @@ using Mercadorias.Infra.Repository.Contexts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Mercadorias.Infra.Repository.Migrations
 {
     [DbContext(typeof(SqlServerContext))]
-    partial class SqlServerContextModelSnapshot : ModelSnapshot
+    [Migration("20230613010804_ckelw")]
+    partial class ckelw
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

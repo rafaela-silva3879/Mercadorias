@@ -13,7 +13,7 @@ namespace Mercadorias.Domain.Entities
         public DateTime DataHoraSaida { get; set; }
         public string LocalSaida { get; set; }
 
-        public int IdMercadoria { get; set; }
+        public Guid IdMercadoria { get; set; }
         public Mercadoria Mercadoria { get; set; }
     }
 }

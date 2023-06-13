@@ -31,7 +31,7 @@ namespace Mercadorias.Infra.Repository.Migrations
                     QuantidadeEntrada = table.Column<int>(type: "int", nullable: false),
                     DataHoraEntrada = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LocalEntrada = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IdMercadoria = table.Column<int>(type: "int", nullable: false)
+                    IdMercadoria = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -51,7 +51,7 @@ namespace Mercadorias.Infra.Repository.Migrations
                     QuantidadeSaida = table.Column<int>(type: "int", nullable: false),
                     DataHoraSaida = table.Column<DateTime>(type: "datetime2", nullable: false),
                     LocalSaida = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    IdMercadoria = table.Column<int>(type: "int", nullable: false)
+                    IdMercadoria = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Mercadorias.Infra.Repository.Migrations
 {
     [DbContext(typeof(SqlServerContext))]
-    [Migration("20230518190245_initial")]
+    [Migration("20230612213616_initial")]
     partial class initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,8 +29,8 @@ namespace Mercadorias.Infra.Repository.Migrations
                     b.Property<DateTime>("DataHoraEntrada")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("IdMercadoria")
-                        .HasColumnType("int");
+                    b.Property<Guid>("IdMercadoria")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LocalEntrada")
                         .IsRequired()
@@ -89,8 +89,8 @@ namespace Mercadorias.Infra.Repository.Migrations
                     b.Property<DateTime>("DataHoraSaida")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("IdMercadoria")
-                        .HasColumnType("int");
+                    b.Property<Guid>("IdMercadoria")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LocalSaida")
                         .IsRequired()

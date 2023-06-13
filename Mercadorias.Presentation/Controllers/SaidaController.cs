@@ -9,6 +9,7 @@ using System.Text;
 using Mercadorias.Domain.Entities;
 using Mercadorias.Domain.Interfaces.Services;
 using Mercadorias.Application.Services;
+using Newtonsoft.Json;
 
 namespace Mercadorias.Presentation.Controllers
 {
@@ -30,26 +31,26 @@ namespace Mercadorias.Presentation.Controllers
 
         }
         [HttpPost]
-        [Consumes("application/json")]
-        public JsonResult AddSaida([FromBody] SaidaCreateModel sm)
+        //[Consumes("application/json")]
+        //public JsonResult AddSaida([FromBody] SaidaCreateModel sm)
+        public JsonResult AddSaida(string json)
         {
             var erro = new ErrorModel();
             try
             {
-                if (ModelState.IsValid)
-                {
-                    var s = new Saida();
-                    s.IdSaida = Guid.NewGuid();
-                    s.DataHoraSaida = sm.DataHoraSaida;
-                    s.LocalSaida = sm.LocalSaida;
-                    s.QuantidadeSaida = sm.QuantidadeSaida;
-                    s.IdMercadoria = sm.IdMercadoria;
+                dynamic dyn = JsonConvert.DeserializeObject(json);
+                
+                var s = new Saida();
 
-                    _saidaapplicationservice.Create(s);
+                s.IdSaida = Guid.NewGuid();
+                s.DataHoraSaida = Convert.ToDateTime(dyn.DataHoraSaida);
+                s.LocalSaida =dyn.LocalSaida;
+                s.QuantidadeSaida = Convert.ToInt32(dyn.QuantidadeSaida);
+                var Id = (Guid)dyn.IdMercadoria;
+                s.IdMercadoria = Id;
 
-                    ModelState.Clear();
-
-                }
+                _saidaapplicationservice.Create(s);
+                ModelState.Clear(); 
                 return Json("Saída salva com sucesso.");
 
 

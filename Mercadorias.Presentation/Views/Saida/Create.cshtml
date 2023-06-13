@@ -38,17 +38,11 @@
     <div class="row">
         <div class="col-md-4">
             <label>Data e hora da saída:</label>
-            <input type="datetime-local" id="meeting-time"
-                   name="DataHoraEntrada" value="2023-01-01T19:30"
+            <input type="datetime-local" 
+                   id="txtDataHoraSaida"
+                   name="DataHoraSaida"
                    min="2023-01-01T00:00" max="" class="form-control">
         </div>
-        <div class="col-md-4">
-
-            <label>Descrição</label>
-            <textarea required id="txtDescricao" name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
-
-        </div>
-
     </div>
     <div class="row">
         <div class="col-md-12">
@@ -104,7 +98,7 @@
 
         $("#divErro").hide();
         $("#divSuccess").hide();
-        $("#divWarning").hide();
+     
 
 
         $.validator.addMethod('numbersonly', function (value, element) {
@@ -112,7 +106,7 @@
         }, "Este campo aceita somente números.");
 
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
-            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
+            return this.optional(element) || /^[a-zA-Z.\s'éãíúóÓÉÁÚç]+$/.test(value);
         }, "Por favor, escreva um nome válido.");
 
         $.validator.addMethod('lettersonly', function (value, element) {
@@ -176,15 +170,19 @@
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
             if ($("form").valid()) {
-                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), IdMercadoria: $("#txtmercadoriaDropdown").val() }
-
+                var CreateModel = { QuantidadeSaida: $("#txtQuantidadeSaida").val(), LocalSaida: $("#txtLocalSaida").val(),
+                    DataHoraSaida: $("#txtDataHoraSaida").val(), IdMercadoria: $("#txtmercadoriaDropdown").val()
+                }
+            
+                var y = JSON.stringify(CreateModel);
 
                 $.ajax({
                     url: "/Saida/AddSaida",
                     type: "POST",
-                    contentType: "application/json; chatset=utf-8",
-                    cache: false,
-                    data: JSON.stringify(CreateModel),
+                    //contentType: "application/json; chatset=utf-8",
+                    cache: false,                    
+                    dataType: "json",
+                    data: { 'json': y },
                     success: function (response) {
                         $("#divErro").hide();
                         if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
@@ -200,7 +198,6 @@
                             $("#txtRegistro").val('');
                             $("#txtFabricante").val('');
                             $("#txtTipo").val('');
-                            $("#txtDescricao").val('');
                         }
                     },
                     error: function (xhr, status, error) {

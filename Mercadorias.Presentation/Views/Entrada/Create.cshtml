@@ -29,27 +29,22 @@
     <div class="row">
         <div class="col-md-4">
             <label>Local de entrada:</label>
-            <input type="text" lettersonly class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
+            <input type="text" class="form-control" required id="txtLocalEntrada" name="LocalEntrada" maxlength="50" />
         </div>
         <div class="col-md-4">
             <label>Mercadorias</label>
-            <select class="form-control" required id="txtmercadoriaDropdown" name="mercadoriaDropdown"></select>
+            <select class="form-control" required id="mercadoriaDropdown" name="mercadoriaDropdown"></select>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-4">
             <label>Data e hora da entrada:</label>
-            <input type="datetime-local" id="meeting-time"
-                   name="DataHoraEntrada" value="2023-01-01T19:30"
+            <input type="datetime-local" id="txtDataHoraEntrada"
+                   name="DataHoraEntrada" required
                    min="2023-01-01T00:00" max="" class="form-control" />
         </div>
-        <div class="col-md-4">
-
-            <label>Descrição</label>
-            <textarea required id="txtDescricao" lettersanddotsonly name="Descricao" rows="4" cols="100" maxlength="200" class="form-control"></textarea>
-
-        </div>
+     
     </div>
 
     <div class="row">
@@ -115,7 +110,7 @@
             return this.optional(element) || /^[0-9]+$/.test(value);
         }, "Este campo aceita somente números.");
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
-            return this.optional(element) || /^[a-zA-Z.\s'éãíúó]+$/.test(value);
+            return this.optional(element) || /^[a-zA-Z.\s'éãíúóÓÉÁÚç]+$/.test(value);
         }, "Este campo aceita somente letras e pontos.");
         $.validator.addMethod('lettersonly', function (value, element) {
             return this.optional(element) || /^[A-Z]+$/.test(value);
@@ -170,7 +165,7 @@
                 for (var i = 0; i < data.length; i++) {
                     s += '<option value="' + data[i].id + '">' + data[i].nome + '</option>';
                 }
-                $("#txtmercadoriaDropdown").html(s);
+                $("#mercadoriaDropdown").html(s);
             },
             error: function (xhr, status, error) {
 
@@ -181,77 +176,23 @@
 
 
 
+
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
             if ($("form").valid()) {
-                //var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), state: $("#statesDropdown").val() }
-                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), State: $("#statesDropdown").val() }
+                var CreateModel = {LocalEntrada: $("#txtLocalEntrada").val(), QuantidadeEntrada: $("#txtQuantidadeEntrada").val(),
+                    DataHoraEntrada: $("#txtDataHoraEntrada").val(), IdMercadoria: $("#mercadoriaDropdown").val()}
+
                 var y = JSON.stringify(CreateModel);
-
-                $.ajax({
-                    type: "POST",
-                    url: "/Friend/AddFriend",
-                    data: { 'json': y },
-                    //contentType: "application/json; charset=utf-8",
-                    dataType: "json",
-                    success: function (response) {
-                        $("#divErro").hide();
-                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
-                            $("#errorMsg").html(response.errorStr);
-                            alert("response:" + response.errorStr);
-                            $("#divErro").show();
-                        }
-                        else {
-                            $("#divSuccess").show();
-                            $("#successMsg").html(response);
-                            console.log(response)
-                            $("#txtFriendName").val('');
-                            $("#txtPhone").val('');
-                            $("#txtState").val('');
-
-                        }
-                    },
-                    error: function (xhr, status, error) {
-
-                        //alert(xhr.responseText);
-                    }
-                });
-            }
-        });
-
-
-
-
-        $("#txtPhone").mask("(99)99999-9999");
-
-        $("#txtPhone").on("blur", function () {
-            var last = $(this).val().substr($(this).val().indexOf("-") + 1);
-
-            if (last.length == 3) {
-                var move = $(this).val().substr($(this).val().indexOf("-") - 1, 1);
-                var lastfour = move + last;
-                var first = $(this).val().substr(0, 9);
-
-                $(this).val(first + '-' + lastfour);
-            }
-        });
-
-
-
-
-
-        $("#btnSubmit").click(function (e) {
-            e.preventDefault();
-            if ($("form").valid()) {
-                var CreateModel = { FriendName: $("#txtFriendName").val(), Phone: $("#txtPhone").val(), IdMercadoria: $("#txtmercadoriaDropdown").val() }
-
+               
 
                 $.ajax({
                     url: "/Entrada/AddEntrada",
                     type: "POST",
-                    contentType: "application/json; chatset=utf-8",
+                    //contentType: "application/json; chatset=utf-8",
+                    dataType: "json",
                     cache: false,
-                    data: JSON.stringify(CreateModel),
+                    data: { 'json': y },
                     success: function (response) {
                         $("#divErro").hide();
                         if (response.errorStr != undefined &&
@@ -268,7 +209,6 @@
                             $("#txtRegistro").val('');
                             $("#txtFabricante").val('');
                             $("#txtTipo").val('');
-                            $("#txtDescricao").val('');
                         }
                     },
                     error: function (xhr, status, error) {

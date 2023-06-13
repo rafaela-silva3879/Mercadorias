@@ -8,6 +8,7 @@ using Mercadorias.Application.Interfaces;
 using System.Text;
 using Mercadorias.Domain.Entities;
 using Mercadorias.Domain.Interfaces.Services;
+using Newtonsoft.Json;
 
 namespace Mercadorias.Presentation.Controllers
 {
@@ -34,26 +35,28 @@ namespace Mercadorias.Presentation.Controllers
   
 
         [HttpPost]
-        [Consumes("application/json")]
-        public JsonResult AddEntrada([FromBody] EntradaCreateModel em)
+        //[Consumes("application/json")]
+        //public JsonResult AddEntrada([FromBody] EntradaCreateModel em)
+        public JsonResult AddEntrada(string json)
         {
             var erro = new ErrorModel();
             try
             {
-                if (ModelState.IsValid)
-                {
-                    var e = new Entrada();
+                //if (ModelState.IsValid)
+                //{
+                dynamic dyn = JsonConvert.DeserializeObject(json);
+                var e = new Entrada();
                     e.IdEntrada = Guid.NewGuid();
-                    e.DataHoraEntrada = em.DataHoraEntrada;
-                    e.LocalEntrada = em.LocalEntrada;
-                    e.QuantidadeEntrada = em.QuantidadeEntrada;
-                    e.IdMercadoria = em.IdMercadoria;
-
+                    e.DataHoraEntrada = dyn.DataHoraEntrada;
+                    e.LocalEntrada = dyn.LocalEntrada;
+                    e.QuantidadeEntrada = dyn.QuantidadeEntrada;
+                    e.IdMercadoria = dyn.IdMercadoria;
+                    
                     _Entradaapplicationservice.Create(e);
 
                     ModelState.Clear();
 
-                }
+                //}
                 return Json("Entrada salva com sucesso.");
 
 
