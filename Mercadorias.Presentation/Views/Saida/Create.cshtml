@@ -106,11 +106,11 @@
         }, "Este campo aceita somente números.");
 
         $.validator.addMethod('lettersanddotsonly', function (value, element) {
-            return this.optional(element) || /^[a-zA-Z.\s'éãíúóÓÉÁÚç]+$/.test(value);
+            return this.optional(element) || /^[a-zA-Z.\s'éãáíúóÓÉÁÚç]+$/.test(value);
         }, "Por favor, escreva um nome válido.");
 
         $.validator.addMethod('lettersonly', function (value, element) {
-            return this.optional(element) || /^[A-Z]+$/.test(value);
+            return this.optional(element) || /^[a-zA-Z]+$/.test(value);
         }, "Este campo aceita somente letras.");
 
         $("form").validate({

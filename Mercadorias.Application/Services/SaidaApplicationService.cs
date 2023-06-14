@@ -58,8 +58,9 @@ namespace Mercadorias.Application.Services
                     x.DataHoraSaida = item.DataHoraSaida;
                     x.IdSaida = item.IdSaida;
                     x.LocalSaida = item.LocalSaida;
-                    x.Mercadoria = item.Mercadoria;
+                   x.IdMercadoria=item.IdMercadoria;
                     x.QuantidadeSaida = item.QuantidadeSaida;
+                    x.Mercadoria = item.Mercadoria;
 
                     lista.Add(x);
                 }
@@ -86,8 +87,9 @@ namespace Mercadorias.Application.Services
                     x.DataHoraSaida = item.DataHoraSaida;
                     x.IdSaida = item.IdSaida;
                     x.LocalSaida = item.LocalSaida;
-                    x.Mercadoria = item.Mercadoria;
+                    x.IdMercadoria = item.IdMercadoria;
                     x.QuantidadeSaida = item.QuantidadeSaida;
+                    x.Mercadoria = item.Mercadoria;
 
                     lista.Add(x);
                 }
@@ -123,6 +125,7 @@ namespace Mercadorias.Application.Services
                 x.DataHoraSaida = obj.DataHoraSaida;
                 x.IdSaida = obj.IdSaida;
                 x.LocalSaida = obj.LocalSaida;
+                x.IdMercadoria = obj.IdMercadoria;
                 x.QuantidadeSaida = obj.QuantidadeSaida;
 
                 _SaidaDomainService.Update(x);

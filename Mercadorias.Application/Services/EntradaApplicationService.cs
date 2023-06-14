@@ -58,6 +58,7 @@ namespace Mercadorias.Application.Services
                     x.DataHoraEntrada = item.DataHoraEntrada;
                     x.IdEntrada = item.IdEntrada;
                     x.LocalEntrada = item.LocalEntrada;
+                    x.IdMercadoria= item.IdMercadoria;
                     x.Mercadoria = item.Mercadoria;
                     x.QuantidadeEntrada = item.QuantidadeEntrada;
 
@@ -86,6 +87,7 @@ namespace Mercadorias.Application.Services
                     x.DataHoraEntrada = item.DataHoraEntrada;
                     x.IdEntrada = item.IdEntrada;
                     x.LocalEntrada = item.LocalEntrada;
+                    x.IdMercadoria = item.IdMercadoria;
                     x.Mercadoria = item.Mercadoria;
                     x.QuantidadeEntrada = item.QuantidadeEntrada;
 
@@ -122,6 +124,7 @@ namespace Mercadorias.Application.Services
                 var x = _entradaDomainService.GetById(obj.IdEntrada);
                 x.DataHoraEntrada = obj.DataHoraEntrada;
                 x.IdEntrada = obj.IdEntrada;
+                x.IdMercadoria = obj.IdMercadoria;
                 x.LocalEntrada = obj.LocalEntrada;
                 x.QuantidadeEntrada = obj.QuantidadeEntrada;
 
