@@ -1,4 +1,3 @@
-using Mercadorias.Presentation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace JQuery.Presentation
+namespace Mercadorias.Presentation
 {
     public class Program
     {

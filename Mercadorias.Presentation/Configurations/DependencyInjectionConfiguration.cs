@@ -36,5 +36,6 @@ namespace Mercadorias.Presentation.Configurations
             services.AddTransient<ISaidaDomainService, SaidaDomainService>();
             services.AddTransient<ISaidaRepository, SaidaRepository>();
         }
+
     }
 }

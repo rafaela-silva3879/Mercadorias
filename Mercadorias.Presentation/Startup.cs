@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Mercadorias.Presentation.Configurations;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
+
 
 namespace Mercadorias.Presentation
 {
@@ -28,8 +28,8 @@ namespace Mercadorias.Presentation
         public void ConfigureServices(IServiceCollection services)
         {
             //definir que o modo de navegação do projeto web é MVC (Controllers e Views)
-            //services.AddControllersWithViews();
-            services.AddControllersWithViews().AddNewtonsoftJson();
+            services.AddControllersWithViews();
+            //services.AddControllersWithViews().AddNewtonsoftJson();
 
             DependencyInjectionConfiguration.ConfigureServices(services, Configuration);
         }
@@ -37,6 +37,7 @@ namespace Mercadorias.Presentation
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+        
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -44,6 +45,7 @@ namespace Mercadorias.Presentation
             //autenticação no projeto..
             app.UseCookiePolicy();
             app.UseAuthentication();
+         
 
             app.UseHttpsRedirection();
 

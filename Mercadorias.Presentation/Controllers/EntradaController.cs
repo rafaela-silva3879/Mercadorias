@@ -18,7 +18,7 @@ namespace Mercadorias.Presentation.Controllers
         private readonly IMercadoriaApplicationService _Mercadoriaapplicationservice;
 
 
-        public EntradaController(IEntradaApplicationService Entradaapplicationservice,            
+        public EntradaController(IEntradaApplicationService Entradaapplicationservice,
             IMercadoriaApplicationService Mercadoriaapplicationservice)
         {
 
@@ -32,7 +32,7 @@ namespace Mercadorias.Presentation.Controllers
 
         }
 
-  
+
 
         [HttpPost]
         //[Consumes("application/json")]
@@ -46,15 +46,15 @@ namespace Mercadorias.Presentation.Controllers
                 //{
                 dynamic dyn = JsonConvert.DeserializeObject(json);
                 var e = new Entrada();
-                    e.IdEntrada = Guid.NewGuid();
-                    e.DataHoraEntrada = dyn.DataHoraEntrada;
-                    e.LocalEntrada = dyn.LocalEntrada;
-                    e.QuantidadeEntrada = dyn.QuantidadeEntrada;
-                    e.IdMercadoria = dyn.IdMercadoria;
-                    
-                    _Entradaapplicationservice.Create(e);
+                e.IdEntrada = Guid.NewGuid();
+                e.DataHoraEntrada = dyn.DataHoraEntrada;
+                e.LocalEntrada = dyn.LocalEntrada;
+                e.QuantidadeEntrada = dyn.QuantidadeEntrada;
+                e.IdMercadoria = dyn.IdMercadoria;
 
-                    ModelState.Clear();
+                _Entradaapplicationservice.Create(e);
+
+                ModelState.Clear();
 
                 //}
                 return Json("Entrada salva com sucesso.");

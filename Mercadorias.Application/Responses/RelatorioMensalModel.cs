@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System;
 
-namespace Mercadorias.Presentation.Models
+namespace Mercadorias.Application.Responses
 {
     public class RelatorioMensalModel
     {

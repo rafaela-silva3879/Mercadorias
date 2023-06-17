@@ -14,7 +14,7 @@ namespace Mercadorias.Presentation.Models
 
         public string Descricao { get; set; }
 
-        public string  LocalSaida { get; set; }
+        public string LocalSaida { get; set; }
 
         public string NomeFabricante { get; set; }
 

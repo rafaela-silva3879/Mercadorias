@@ -39,18 +39,18 @@ namespace Mercadorias.Presentation.Controllers
             try
             {
                 dynamic dyn = JsonConvert.DeserializeObject(json);
-                
+
                 var s = new Saida();
 
                 s.IdSaida = Guid.NewGuid();
                 s.DataHoraSaida = Convert.ToDateTime(dyn.DataHoraSaida);
-                s.LocalSaida =dyn.LocalSaida;
+                s.LocalSaida = dyn.LocalSaida;
                 s.QuantidadeSaida = Convert.ToInt32(dyn.QuantidadeSaida);
                 var Id = (Guid)dyn.IdMercadoria;
                 s.IdMercadoria = Id;
 
                 _saidaapplicationservice.Create(s);
-                ModelState.Clear(); 
+                ModelState.Clear();
                 return Json("Saída salva com sucesso.");
 
 
@@ -68,5 +68,5 @@ namespace Mercadorias.Presentation.Controllers
 
 
 
-     }
+    }
 }

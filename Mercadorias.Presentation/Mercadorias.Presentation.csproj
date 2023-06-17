@@ -5,21 +5,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Controllers\EntradaController.cs~RF111d1e48.TMP" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Mercadorias.Application\Mercadorias.Application.csproj" />
     <ProjectReference Include="..\Mercadorias.Domain\Mercadorias.Domain.csproj" />
     <ProjectReference Include="..\Mercadorias.Infra.Repository\Mercadorias.Infra.Repository.csproj" />
+    <ProjectReference Include="..\Mercadorias.Reports.Pdf\Mercadorias.Reports.Pdf.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.17" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.17" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
+    <Folder Include="PDF\" />
   </ItemGroup>
 
 </Project>

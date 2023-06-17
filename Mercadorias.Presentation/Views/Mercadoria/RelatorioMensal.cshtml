@@ -1,4 +1,4 @@
-﻿@model Mercadorias.Presentation.Models.RelatorioMensalModel
+﻿@model Mercadorias.Presentation.Models.MesAnoModel
 
 @{
     Layout = "~/Views/Shared/Layout.cshtml";
@@ -29,14 +29,18 @@
             <label>Ano</label>
             <select class="form-control" required id="anoDropdown" name="anoDropdown"></select>
         </div>
+        
+    </div>
 
+       <div class="row">
+        <div class="col-md-2">
+            <input type="button" id="btnSubmit" class="btn btn-primary" value="Pesquisar" />
+         </div>
+        <div class="col-md-2">
+            <input type="button" id="btnPdf" class="btn btn-primary" value="Gerar Relatório">
         </div>
-
-        <div class="row">
-        <div class="col-md-6">
-
-            <input type="submit" id="btnSubmit" class="btn btn-success" value="Pesquisar" />
-
+        <div class="col-md-2" id="divLinkDownload">
+            <a href="#" id="linkDownload">Baixar Relatório</a>
         </div>
     </div>
 
@@ -78,7 +82,7 @@
 
         $("#divErro").hide();
         $("#divSuccess").hide();
-
+        $("#divLinkDownload").hide();
 
         $.ajax({
             type: "GET",
@@ -118,22 +122,63 @@
             }
         });
 
+        $("#btnPdf").click(function (e) {
+            e.preventDefault();
+            $("#divLinkDownload").hide();
+
+            var MesAnoModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val() }
+
+            var y = JSON.stringify(MesAnoModel);
+
+
+            $.ajax({
+                type: "POST",
+                url: "/Mercadoria/RelatorioPdf",
+                contentType: "application/json; chatset=utf-8",
+                cache: false,
+                data: y,
+                success: function (response) {
+                    $("#divErro").hide();
+                    if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                        $("#errorMsg").html(response.errorStr);
+                        $("#divLinkDownload").attr("href", downloadLink);
+                        $("#divErro").show();
+                    }
+                    else {
+
+                        // Exibir o link de download
+                        var downloadLink = response.downloadLink;
+                        $("#linkDownload").attr("href", downloadLink);
+
+                        $("#divLinkDownload").show();
+                    }
+
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    alert(xhr.responseText);
+                }
+            });
+        });
 
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
+
             $("#divErro").hide();
             $("#divSuccess").hide();
+            $("#divLinkDownload").hide();
+            var MesAnoModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val() }
 
-            var RelatorioMensalModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val()}
+            var y = JSON.stringify(MesAnoModel);
 
-            var y = JSON.stringify(RelatorioMensalModel);
-         
             //ajax aqui
-            
+
 
             $.ajax({
                 url: "/Mercadoria/RelatorioMensal",
-               type: "POST",
+                type: "POST",
                 contentType: "application/json; chatset=utf-8",
                 cache: false,
                 data: y,
@@ -147,7 +192,7 @@
                     else {
 
                         alert(response[0].nomeMercadoria);
-                        
+
                         //datatable aqui
                         var table = $('#exampleDatatable').DataTable();
                         table.destroy();

@@ -38,7 +38,7 @@
     <div class="row">
         <div class="col-md-4">
             <label>Data e hora da saída:</label>
-            <input type="datetime-local" 
+            <input type="datetime-local"
                    id="txtDataHoraSaida"
                    name="DataHoraSaida"
                    min="2023-01-01T00:00" max="" class="form-control">
@@ -98,7 +98,7 @@
 
         $("#divErro").hide();
         $("#divSuccess").hide();
-     
+
 
 
         $.validator.addMethod('numbersonly', function (value, element) {
@@ -161,7 +161,7 @@
             },
             error: function (e) {
                 console.log('Erro. \n' + e);
-                alert('Erro. \n'+ e);
+                alert('Erro. \n' + e);
             }
         });
 
@@ -170,17 +170,18 @@
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
             if ($("form").valid()) {
-                var CreateModel = { QuantidadeSaida: $("#txtQuantidadeSaida").val(), LocalSaida: $("#txtLocalSaida").val(),
+                var CreateModel = {
+                    QuantidadeSaida: $("#txtQuantidadeSaida").val(), LocalSaida: $("#txtLocalSaida").val(),
                     DataHoraSaida: $("#txtDataHoraSaida").val(), IdMercadoria: $("#txtmercadoriaDropdown").val()
                 }
-            
+
                 var y = JSON.stringify(CreateModel);
 
                 $.ajax({
                     url: "/Saida/AddSaida",
                     type: "POST",
                     //contentType: "application/json; chatset=utf-8",
-                    cache: false,                    
+                    cache: false,
                     dataType: "json",
                     data: { 'json': y },
                     success: function (response) {

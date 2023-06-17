@@ -10,6 +10,9 @@ using Mercadorias.Domain.Entities;
 using Mercadorias.Domain.Interfaces.Services;
 using Mercadorias.Application.Services;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Mercadorias.Reports.Pdf;
+using Mercadorias.Application.Responses;
+using System.IO;
 
 namespace Mercadorias.Presentation.Controllers
 {
@@ -119,14 +122,59 @@ namespace Mercadorias.Presentation.Controllers
             }
         }
 
-        public IActionResult Relatorio()
+        public IActionResult RelatorioMensal()
         {
             return View();
         }
 
+        public List<RelatorioMensalModel> GetDadosRelatorio(int mes, int ano)
+        {
+            try
+            {
+                var listarel = new List<RelatorioMensalModel>();
+
+                var entradasMes = _entradaApplicationService.GetAll().Where(x => x.DataHoraEntrada.Month == mes && x.DataHoraEntrada.Year == ano);
+                var saidasMes = _saidaApplicationService.GetAll().Where(x => x.DataHoraSaida.Month == mes && x.DataHoraSaida.Year == ano);
+
+                var listaIdMercadoriasAux = new List<Guid>();
+                listaIdMercadoriasAux.AddRange(entradasMes.Select(x => x.IdMercadoria).Distinct());
+                listaIdMercadoriasAux.AddRange(saidasMes.Select(x => x.IdMercadoria).Distinct());
+
+                var listaIdMercadorias = new List<Guid>();
+
+                listaIdMercadorias.AddRange(listaIdMercadoriasAux.Distinct());
+
+
+                RelatorioMensalModel rel;
+                foreach (var id in listaIdMercadorias)
+                {
+                    rel = new RelatorioMensalModel();
+
+                    rel.IdMercadoria = Convert.ToString(id);
+                    var mercadoria = _mercadoriaApplicationService.GetById(id);
+
+                    rel.Mes = mes;
+                    rel.Ano = ano;
+                    rel.NomeMercadoria = mercadoria.Nome;
+                    rel.NumeroRegistro = mercadoria.NumeroRegistro;
+                    rel.QuantidadeEntrada = entradasMes.Where(x => x.IdMercadoria == id).Sum(x => x.QuantidadeEntrada);
+                    rel.QuantidadeSaida = saidasMes.Where(x => x.IdMercadoria == id).Sum(x => x.QuantidadeSaida);
+                    rel.QuantidadeRestante = _entradaApplicationService.GetAll().Where(x => x.DataHoraEntrada.Month <= mes && x.DataHoraEntrada.Year <= ano && x.IdMercadoria == id).Sum(x => x.QuantidadeEntrada) - _saidaApplicationService.GetAll().Where(x => x.DataHoraSaida.Month <= mes && x.DataHoraSaida.Year <= ano && x.IdMercadoria == id).Sum(x => x.QuantidadeSaida);
+
+                    listarel.Add(rel);
+                }
+                return listarel;
+            }
+            catch (Exception)
+            {
+
+                throw;
+            }
+        }
+
         [HttpPost]
         [Consumes("application/json")]
-        public JsonResult RelatorioMensal([FromBody] RelatorioMensalModel model)
+        public JsonResult RelatorioMensal([FromBody] MesAnoModel model)
         {
             ErrorModel erro;
             var listarel = new List<RelatorioMensalModel>();
@@ -136,38 +184,12 @@ namespace Mercadorias.Presentation.Controllers
                 {
                     var mesAux = Convert.ToInt32(model.Mes);
                     var anoAux = Convert.ToInt32(model.Ano);
-                    var entradasMes = _entradaApplicationService.GetAll().Where(x => x.DataHoraEntrada.Month == mesAux && x.DataHoraEntrada.Year == anoAux);
-                    var saidasMes = _saidaApplicationService.GetAll().Where(x => x.DataHoraSaida.Month == mesAux && x.DataHoraSaida.Year == anoAux);
-
-                    var listaIdMercadoriasAux = new List<Guid>();
-                    listaIdMercadoriasAux.AddRange(entradasMes.Select(x => x.IdMercadoria).Distinct());
-                    listaIdMercadoriasAux.AddRange(saidasMes.Select(x => x.IdMercadoria).Distinct());
-
-                    var listaIdMercadorias = new List<Guid>();
-
-                    listaIdMercadorias.AddRange(listaIdMercadoriasAux.Distinct());
 
 
-                    RelatorioMensalModel rel;
-                    foreach (var id in listaIdMercadorias)
-                    {
-                        rel = new RelatorioMensalModel();
-
-                        rel.IdMercadoria = Convert.ToString(id);
-                        var mercadoria = _mercadoriaApplicationService.GetById(id);
-
-
-                        rel.NomeMercadoria = mercadoria.Nome;
-                        rel.NumeroRegistro = mercadoria.NumeroRegistro;
-                        rel.QuantidadeEntrada = entradasMes.Where(x => x.IdMercadoria == id).Sum(x => x.QuantidadeEntrada);
-                        rel.QuantidadeSaida = saidasMes.Where(x => x.IdMercadoria == id).Sum(x => x.QuantidadeSaida);
-                        rel.QuantidadeRestante = _entradaApplicationService.GetAll().Where(x => x.DataHoraEntrada.Month <= mesAux && x.DataHoraEntrada.Year <= anoAux && x.IdMercadoria == id).Sum(x => x.QuantidadeEntrada) - _saidaApplicationService.GetAll().Where(x => x.DataHoraSaida.Month <= mesAux && x.DataHoraSaida.Year <= anoAux && x.IdMercadoria == id).Sum(x => x.QuantidadeSaida);
-
-                        listarel.Add(rel);
-                    }
+                    listarel = GetDadosRelatorio(mesAux, anoAux);
 
                     //x.DataHora = item.DataHoraSaida.ToString("dd'/'MM'/'yyyy");
-                 
+               
                 }
                 catch (Exception e)
                 {
@@ -181,5 +203,48 @@ namespace Mercadorias.Presentation.Controllers
             return Json(listarel); //devolver a 'model' para a página
         }
 
+        [HttpPost]
+        public IActionResult RelatorioPdf([FromBody]MesAnoModel model)
+        { 
+            var erro = new ErrorModel();
+
+            if(String.IsNullOrEmpty(model.Mes.ToString()) || String.IsNullOrEmpty(model.Ano.ToString()))
+            {
+                erro.ErrorStr = "Por favor, escolha o mês e o ano.";
+                return Json(erro);
+            }
+                      
+            var mercadorias = GetDadosRelatorio(model.Mes, model.Ano);
+            //gerando um relatorio de tarefas em arquivo PDF
+            var mercadoriasReportPdf = new MercadoriasReportPdf();
+            byte[] pdfBytes = mercadoriasReportPdf.GerarRelatorio(mercadorias);
+
+            // Define o nome do arquivo PDF para download
+            string fileName = Guid.NewGuid().ToString() + ".pdf";
+           
+            //fazendo download do arquivo pdf..
+            // return File(pdfBytes, "application/pdf", fileName);
+
+            //var arquivo = new FileContentResult(pdfBytes, "application/pdf");
+            //arquivo.FileDownloadName = fileName;
+
+
+            //return arquivo;
+            // Salvar o arquivo PDF na pasta "PDFs" (certifique-se de que a pasta exista)
+
+            string filePath = Path.Combine("PDF", fileName);
+            System.IO.File.WriteAllBytes(filePath, pdfBytes);
+
+            // Criar o link de download para o usuário
+            string downloadLink = Url.Content("~/PDF/" + fileName);
+           
+            // Retornar a URL do link de download
+            return Ok(new { downloadLink });
+
+
+            // Retornar o arquivo PDF para download
+            //return File(pdfBytes, "application/pdf", fileName);
+
+        }
     }
 }
