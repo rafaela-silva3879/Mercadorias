@@ -83,12 +83,25 @@
 @*validation*@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+<style>
+    .my-error-class {
+        color: #FF0000; /* red */
+    }
 
+</style>
 <script>
     jQuery.extend(jQuery.validator.messages, {
         required: "Este campo é requerido."
     });
         $(document).ready(function () {
+
+
+        $("form").validate({
+            errorClass: "my-error-class"
+        });
+
+
+
 
         // Variável global para armazenar o caminho de download
         var downloadPath = '';
