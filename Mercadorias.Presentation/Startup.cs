@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Mercadorias.Presentation.Configurations;
-
+using System.IO;
 
 namespace Mercadorias.Presentation
 {
@@ -49,9 +49,11 @@ namespace Mercadorias.Presentation
 
             app.UseHttpsRedirection();
 
-            //habilitar a pasta /wwwroot
-            app.UseStaticFiles();
+         
             app.UseRouting();
+
+            //para poder fazer o download do pdf
+            app.UseStaticFiles();
 
             //mapeando a página inicial do projeto
             app.UseEndpoints(endpoints =>

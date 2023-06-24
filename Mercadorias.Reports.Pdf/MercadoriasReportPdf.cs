@@ -15,6 +15,7 @@ namespace Mercadorias.Reports.Pdf
     {
         public byte[] GerarRelatorio(List<RelatorioMensalModel> mercadorias)
         {
+
             //criando um documento PDF
             var memoryStream = new MemoryStream();
             var pdf = new PdfDocument(new PdfWriter(memoryStream));

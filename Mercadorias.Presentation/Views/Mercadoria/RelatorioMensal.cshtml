@@ -29,19 +29,22 @@
             <label>Ano</label>
             <select class="form-control" required id="anoDropdown" name="anoDropdown"></select>
         </div>
-        
-    </div>
 
-       <div class="row">
-        <div class="col-md-2">
+    </div>
+    <br />
+    <div class="row">
+
+        <div class="col-md-8" style="display:inline-flex">
+
             <input type="button" id="btnSubmit" class="btn btn-primary" value="Pesquisar" />
-         </div>
-        <div class="col-md-2">
+            &nbsp; &nbsp; &nbsp;
             <input type="button" id="btnPdf" class="btn btn-primary" value="Gerar Relatório">
+            &nbsp; &nbsp;
+            <div id="divLinkDownload">
+                <a href="#" id="linkDownload" download>Baixar Relatório</a>
+            </div>
         </div>
-        <div class="col-md-2" id="divLinkDownload">
-            <a href="#" id="linkDownload">Baixar Relatório</a>
-        </div>
+
     </div>
 
 
@@ -64,6 +67,8 @@
         </div>
 
     </div>
+
+
 </form>
 
 
@@ -75,10 +80,18 @@
 <!--End datatables-->
 @*<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>*@
 
+@*validation*@
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
 
 <script>
+    jQuery.extend(jQuery.validator.messages, {
+        required: "Este campo é requerido."
+    });
+        $(document).ready(function () {
 
-    $(document).ready(function () {
+        // Variável global para armazenar o caminho de download
+        var downloadPath = '';
 
         $("#divErro").hide();
         $("#divSuccess").hide();
@@ -122,46 +135,77 @@
             }
         });
 
+
+        $("#linkDownload").click(function () {
+            excluirArquivo();
+        });
+
+        function excluirArquivo() {
+            // Verificar se o caminho de download está definido
+            if (downloadPath !== '') {
+                // Executar uma requisição AJAX para chamar o método de exclusão do arquivo no backend
+                $.ajax({
+                    url: '/Mercadoria/ExcluirArquivo',
+                    type: 'POST',
+                    data: { filePath: downloadPath },
+                    success: function (response) {
+                        console.log("Arquivo excluído com sucesso!");
+                        $("#divLinkDownload").hide();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log("Ocorreu um erro ao excluir o arquivo: " + error);
+                    }
+                });
+            } else {
+                console.log("Caminho de download não definido.");
+            }
+        }
+
+
         $("#btnPdf").click(function (e) {
             e.preventDefault();
             $("#divLinkDownload").hide();
-
+            if ($("form").valid()) {
             var MesAnoModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val() }
 
             var y = JSON.stringify(MesAnoModel);
+         
 
+                $.ajax({
+                    type: "POST",
+                    url: "/Mercadoria/RelatorioPdf",
+                    contentType: "application/json; chatset=utf-8",
+                    cache: false,
+                    data: y,
+                    success: function (response) {
+                        $("#divErro").hide();
+                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                            $("#errorMsg").html(response.errorStr);                          
+                            $("#divErro").show();
+                        
+                        }
+                        else {
 
-            $.ajax({
-                type: "POST",
-                url: "/Mercadoria/RelatorioPdf",
-                contentType: "application/json; chatset=utf-8",
-                cache: false,
-                data: y,
-                success: function (response) {
-                    $("#divErro").hide();
-                    if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
-                        $("#errorMsg").html(response.errorStr);
-                        $("#divLinkDownload").attr("href", downloadLink);
+                            // Exibir o link de download
+                            downloadPath = response.downloadLink;
+                            $("#linkDownload").attr("href", downloadPath);
+
+                            $("#divLinkDownload").show();
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                     
+                        var errorMessage = xhr.responseText;
+                        $("#errorMsg").html(errorMessage);
                         $("#divErro").show();
                     }
-                    else {
-
-                        // Exibir o link de download
-                        var downloadLink = response.downloadLink;
-                        $("#linkDownload").attr("href", downloadLink);
-
-                        $("#divLinkDownload").show();
-                    }
-
-
-
-                },
-                error: function (xhr, status, error) {
-
-                    alert(xhr.responseText);
-                }
-            });
+                });
+            }
         });
+
+
+
+
 
         $("#btnSubmit").click(function (e) {
             e.preventDefault();
@@ -175,55 +219,58 @@
 
             //ajax aqui
 
+            if ($("form").valid()) {
+                $.ajax({
+                    url: "/Mercadoria/RelatorioMensal",
+                    type: "POST",
+                    contentType: "application/json; chatset=utf-8",
+                    cache: false,
+                    data: y,
+                    success: function (response) {
+                        $("#divErro").hide();
+                        if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
+                            $("#errorMsg").html(response.errorStr);
 
-            $.ajax({
-                url: "/Mercadoria/RelatorioMensal",
-                type: "POST",
-                contentType: "application/json; chatset=utf-8",
-                cache: false,
-                data: y,
-                success: function (response) {
-                    $("#divErro").hide();
-                    if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
-                        $("#errorMsg").html(response.errorStr);
+                            $("#divErro").show();
+                        }
+                        else {
 
+                            alert(response[0].nomeMercadoria);
+
+                            //datatable aqui
+                            var table = $('#exampleDatatable').DataTable();
+                            table.destroy();
+
+                            $("#exampleDatatable").DataTable({
+                                data: response,
+                                retrieve: true,//datatables não dão refresh, então é preciso colocar essa linha pra dizer que é pra usar os dados antigos no click de um botão.
+                                destroy: true,
+                                columns:
+                                    [
+                                        { 'data': 'nomeMercadoria' },
+                                        { 'data': 'numeroRegistro' },
+                                        { 'data': 'quantidadeEntrada' },
+                                        { 'data': 'quantidadeSaida' },
+                                        { 'data': 'quantidadeRestante' }//,  //abaixo: colunas de botões
+                                        //{
+                                        //    "mData": null,
+                                        //    "bSortable": false//,
+                                        //    //"mRender": function (o) {
+
+                                        //    //}
+                                        //},
+                                    ]
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+
+                        var errorMessage = xhr.responseText;
+                        $("#errorMsg").html(errorMessage);
                         $("#divErro").show();
                     }
-                    else {
-
-                        alert(response[0].nomeMercadoria);
-
-                        //datatable aqui
-                        var table = $('#exampleDatatable').DataTable();
-                        table.destroy();
-
-                        $("#exampleDatatable").DataTable({
-                            data: response,
-                            retrieve: true,//datatables não dão refresh, então é preciso colocar essa linha pra dizer que é pra usar os dados antigos no click de um botão.
-                            destroy: true,
-                            columns:
-                                [
-                                    { 'data': 'nomeMercadoria' },
-                                    { 'data': 'numeroRegistro' },
-                                    { 'data': 'quantidadeEntrada' },
-                                    { 'data': 'quantidadeSaida' },
-                                    { 'data': 'quantidadeRestante' }//,  //abaixo: colunas de botões
-                                    //{
-                                    //    "mData": null,
-                                    //    "bSortable": false//,
-                                    //    //"mRender": function (o) {
-
-                                    //    //}
-                                    //},
-                                ]
-                        });
-                    }
-                },
-                error: function (xhr, status, error) {
-
-                    alert("ERRO!" + xhr.responseText);
-                }
-            });
+                });
+            }
         });
 
 

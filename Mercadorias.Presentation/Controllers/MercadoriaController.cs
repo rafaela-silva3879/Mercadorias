@@ -13,6 +13,12 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Mercadorias.Reports.Pdf;
 using Mercadorias.Application.Responses;
 using System.IO;
+using iText.Kernel.Geom;
+using Microsoft.AspNetCore.StaticFiles;
+using System.Net.Mime;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
+using iText.Kernel.XMP.Impl.XPath;
 
 namespace Mercadorias.Presentation.Controllers
 {
@@ -22,13 +28,15 @@ namespace Mercadorias.Presentation.Controllers
         private readonly IEntradaApplicationService _entradaApplicationService;
         private readonly ISaidaApplicationService _saidaApplicationService;
 
+        // Required to obtain physical path
+        private readonly IWebHostEnvironment _hostingEnvironment;
 
-
-        public MercadoriaController(IMercadoriaApplicationService mercadoriaApplicationService, IEntradaApplicationService entradaApplicationService, ISaidaApplicationService saidaApplicationService)
+        public MercadoriaController(IMercadoriaApplicationService mercadoriaApplicationService, IEntradaApplicationService entradaApplicationService, ISaidaApplicationService saidaApplicationService, IWebHostEnvironment hostingEnvironment)
         {
             _mercadoriaApplicationService = mercadoriaApplicationService;
             _entradaApplicationService = entradaApplicationService;
             _saidaApplicationService = saidaApplicationService;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         public IActionResult Create()
@@ -122,15 +130,13 @@ namespace Mercadorias.Presentation.Controllers
             }
         }
 
-        public IActionResult RelatorioMensal()
-        {
-            return View();
-        }
+
 
         public List<RelatorioMensalModel> GetDadosRelatorio(int mes, int ano)
         {
             try
             {
+               
                 var listarel = new List<RelatorioMensalModel>();
 
                 var entradasMes = _entradaApplicationService.GetAll().Where(x => x.DataHoraEntrada.Month == mes && x.DataHoraEntrada.Year == ano);
@@ -139,6 +145,15 @@ namespace Mercadorias.Presentation.Controllers
                 var listaIdMercadoriasAux = new List<Guid>();
                 listaIdMercadoriasAux.AddRange(entradasMes.Select(x => x.IdMercadoria).Distinct());
                 listaIdMercadoriasAux.AddRange(saidasMes.Select(x => x.IdMercadoria).Distinct());
+
+
+
+
+
+                if (listaIdMercadoriasAux ==null || listaIdMercadoriasAux.Count == 0)
+                {
+                    throw new ArgumentException("Não há dados no período informado.");
+                }
 
                 var listaIdMercadorias = new List<Guid>();
 
@@ -172,6 +187,11 @@ namespace Mercadorias.Presentation.Controllers
             }
         }
 
+        public IActionResult RelatorioMensal()
+        {
+            return View();
+        }
+
         [HttpPost]
         [Consumes("application/json")]
         public JsonResult RelatorioMensal([FromBody] MesAnoModel model)
@@ -189,7 +209,14 @@ namespace Mercadorias.Presentation.Controllers
                     listarel = GetDadosRelatorio(mesAux, anoAux);
 
                     //x.DataHora = item.DataHoraSaida.ToString("dd'/'MM'/'yyyy");
-               
+
+                }
+                catch (ArgumentException ex)
+                {
+                    // Tratar a exceção ArgumentException aqui
+                    erro = new ErrorModel();
+                    erro.ErrorStr = ex.Message;
+                    return Json(erro);
                 }
                 catch (Exception e)
                 {
@@ -203,48 +230,63 @@ namespace Mercadorias.Presentation.Controllers
             return Json(listarel); //devolver a 'model' para a página
         }
 
-        [HttpPost]
-        public IActionResult RelatorioPdf([FromBody]MesAnoModel model)
-        { 
-            var erro = new ErrorModel();
 
-            if(String.IsNullOrEmpty(model.Mes.ToString()) || String.IsNullOrEmpty(model.Ano.ToString()))
+        [HttpPost]
+        public IActionResult ExcluirArquivo(string filePath)
+        {
+
+            //excluir o arquivo temporário
+            System.IO.File.Delete(filePath);
+            return Ok();
+        }
+
+
+        [HttpPost]
+        public IActionResult RelatorioPdf([FromBody] MesAnoModel model)
+        {
+            try
             {
-                erro.ErrorStr = "Por favor, escolha o mês e o ano.";
+                var erro = new ErrorModel();
+
+                if (String.IsNullOrEmpty(model.Mes.ToString()) || String.IsNullOrEmpty(model.Ano.ToString()))
+                {
+                    erro.ErrorStr = "Por favor, escolha o mês e o ano.";
+                    return Json(erro);
+                }
+
+                var mercadorias = GetDadosRelatorio(model.Mes, model.Ano);
+                //gerando um relatorio de tarefas em arquivo PDF
+                var mercadoriasReportPdf = new MercadoriasReportPdf();
+                byte[] pdfBytes = mercadoriasReportPdf.GerarRelatorio(mercadorias);
+
+                // Define o nome do arquivo PDF para download
+                string fileName = Guid.NewGuid().ToString() + ".pdf";
+
+                string filePath = System.IO.Path.Combine("wwwroot", "PDFs", fileName);
+                System.IO.File.WriteAllBytes(filePath, pdfBytes);
+
+                string downloadLink = Url.Content("~/PDFs/" + fileName);
+
+                return Ok(new { downloadLink });
+
+            }
+            catch (ArgumentException ex)
+            {
+                // Tratar a exceção ArgumentException aqui
+                var erro = new ErrorModel();
+                erro.ErrorStr = ex.Message;
                 return Json(erro);
             }
-                      
-            var mercadorias = GetDadosRelatorio(model.Mes, model.Ano);
-            //gerando um relatorio de tarefas em arquivo PDF
-            var mercadoriasReportPdf = new MercadoriasReportPdf();
-            byte[] pdfBytes = mercadoriasReportPdf.GerarRelatorio(mercadorias);
+            catch (Exception e)
+            {
 
-            // Define o nome do arquivo PDF para download
-            string fileName = Guid.NewGuid().ToString() + ".pdf";
-           
-            //fazendo download do arquivo pdf..
-            // return File(pdfBytes, "application/pdf", fileName);
-
-            //var arquivo = new FileContentResult(pdfBytes, "application/pdf");
-            //arquivo.FileDownloadName = fileName;
-
-
-            //return arquivo;
-            // Salvar o arquivo PDF na pasta "PDFs" (certifique-se de que a pasta exista)
-
-            string filePath = Path.Combine("PDF", fileName);
-            System.IO.File.WriteAllBytes(filePath, pdfBytes);
-
-            // Criar o link de download para o usuário
-            string downloadLink = Url.Content("~/PDF/" + fileName);
-           
-            // Retornar a URL do link de download
-            return Ok(new { downloadLink });
-
-
-            // Retornar o arquivo PDF para download
-            //return File(pdfBytes, "application/pdf", fileName);
+                // ViewBag.MensagemErro1 = e.Message.ToString();
+               var erro = new ErrorModel();
+                erro.ErrorStr = e.Message;
+                return Json(erro);
+            }
 
         }
     }
 }
+
