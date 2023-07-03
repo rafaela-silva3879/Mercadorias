@@ -47,7 +47,11 @@
 
     </div>
 
-
+    <div class="row">
+        <div class="col-md-12">
+            <div id="chartContainer"></div>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-md-12">
@@ -78,8 +82,9 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.13.2/af-2.5.2/datatables.min.css" />
 <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.13.2/af-2.5.2/datatables.min.js"></script>
 <!--End datatables-->
-@*<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>*@
-
+<!--gráfico-->
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<!--end gráfico-->
 @*validation*@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
@@ -93,7 +98,7 @@
     jQuery.extend(jQuery.validator.messages, {
         required: "Este campo é requerido."
     });
-        $(document).ready(function () {
+    $(document).ready(function () {
 
 
         $("form").validate({
@@ -148,10 +153,10 @@
             }
         });
 
+        // Chamar o evento de clique programaticamente
+        $("#linkDownload").trigger("click");
 
-        $("#linkDownload").click(function () {
-            excluirArquivo();
-        });
+      
 
         function excluirArquivo() {
             // Verificar se o caminho de download está definido
@@ -173,16 +178,18 @@
                 console.log("Caminho de download não definido.");
             }
         }
-
+        $("#linkDownload").click(function () {
+            excluirArquivo();
+        });
 
         $("#btnPdf").click(function (e) {
             e.preventDefault();
             $("#divLinkDownload").hide();
             if ($("form").valid()) {
-            var MesAnoModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val() }
+                var MesAnoModel = { Mes: $("#mesDropdown").val(), Ano: $("#anoDropdown").val() }
 
-            var y = JSON.stringify(MesAnoModel);
-         
+                var y = JSON.stringify(MesAnoModel);
+
 
                 $.ajax({
                     type: "POST",
@@ -193,21 +200,21 @@
                     success: function (response) {
                         $("#divErro").hide();
                         if (response.errorStr != undefined && response.errorStr != null && response.errorStr != '') {
-                            $("#errorMsg").html(response.errorStr);                          
+                            $("#errorMsg").html(response.errorStr);
                             $("#divErro").show();
-                        
+
                         }
                         else {
 
                             // Exibir o link de download
-                            downloadPath = response.downloadLink;
+                            downloadPath = window.location.origin + '/PDFs/' + response.fileName;
+                            
                             $("#linkDownload").attr("href", downloadPath);
-
                             $("#divLinkDownload").show();
                         }
                     },
                     error: function (xhr, status, error) {
-                     
+
                         var errorMessage = xhr.responseText;
                         $("#errorMsg").html(errorMessage);
                         $("#divErro").show();
@@ -248,7 +255,45 @@
                         }
                         else {
 
-                            alert(response[0].nomeMercadoria);
+
+                            // DADOS PARA O GRÁFICO
+                            var chartOptions = {
+                                chart: {
+                                    type: 'scatter'
+                                },
+                                title: {
+                                    text: 'Relação entre Valores de Entrada e Saída'
+                                },
+                                xAxis: {
+                                    title: {
+                                        text: 'Entrada'
+                                    }
+                                },
+                                yAxis: {
+                                    title: {
+                                        text: 'Saída'
+                                    }
+                                },
+                                series: [{
+                                    name: 'Valores',
+                                    data: response.map(function (item) {
+                                        return [item.quantidadeEntrada, item.quantidadeSaida];
+                                    })
+                                }]
+                            };
+
+
+
+
+
+                            // CRIAÇÃO DO GRÁFICO
+                            $('#chartContainer').highcharts(chartOptions);
+
+
+
+
+
+
 
                             //datatable aqui
                             var table = $('#exampleDatatable').DataTable();

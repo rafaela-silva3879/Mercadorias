@@ -146,10 +146,6 @@ namespace Mercadorias.Presentation.Controllers
                 listaIdMercadoriasAux.AddRange(entradasMes.Select(x => x.IdMercadoria).Distinct());
                 listaIdMercadoriasAux.AddRange(saidasMes.Select(x => x.IdMercadoria).Distinct());
 
-
-
-
-
                 if (listaIdMercadoriasAux ==null || listaIdMercadoriasAux.Count == 0)
                 {
                     throw new ArgumentException("Não há dados no período informado.");
@@ -232,11 +228,14 @@ namespace Mercadorias.Presentation.Controllers
 
 
         [HttpPost]
-        public IActionResult ExcluirArquivo(string filePath)
+        public async Task<IActionResult> ExcluirArquivo(string filePath)
         {
+            if (System.IO.File.Exists(filePath))
+            {
+                // Excluir o arquivo
+                System.IO.File.Delete(filePath);
+            }
 
-            //excluir o arquivo temporário
-            System.IO.File.Delete(filePath);
             return Ok();
         }
 
@@ -265,28 +264,22 @@ namespace Mercadorias.Presentation.Controllers
                 string filePath = System.IO.Path.Combine("wwwroot", "PDFs", fileName);
                 System.IO.File.WriteAllBytes(filePath, pdfBytes);
 
-                string downloadLink = Url.Content("~/PDFs/" + fileName);
-
-                return Ok(new { downloadLink });
-
+                return Ok(new { fileName });
             }
             catch (ArgumentException ex)
             {
-                // Tratar a exceção ArgumentException aqui
                 var erro = new ErrorModel();
                 erro.ErrorStr = ex.Message;
                 return Json(erro);
             }
             catch (Exception e)
             {
-
-                // ViewBag.MensagemErro1 = e.Message.ToString();
-               var erro = new ErrorModel();
+                var erro = new ErrorModel();
                 erro.ErrorStr = e.Message;
                 return Json(erro);
             }
-
         }
+
     }
 }
 

@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DotNet.Highcharts" Version="4.0.0" />
     <PackageReference Include="itext7" Version="7.2.5" />
+    <PackageReference Include="ScottPlot" Version="4.1.64" />
   </ItemGroup>
 
   <ItemGroup>
